@@ -1,4 +1,4 @@
-# Data Visualization in R Workshop
+# Data Visualization in R
 
 **Date: October 27, 2026**
 
