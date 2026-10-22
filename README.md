@@ -10,11 +10,8 @@ The seminar will also dive into specialized plots (e.g., heatmaps, Kaplan-Meier 
 
 ## Requirements
 
-1.  Previous experience with R 
-
-2.  Previous experience with basic *ggplot2* functionalities 
-
-3.  Experience with data manipulation using *dplyr* is recommended
+1.	Previous experience with R (basic understanding of syntax, data structures (data frames), and running scripts)
+1.	Experience with data manipulation using dplyr is recommended
 
 ## Setup
 
