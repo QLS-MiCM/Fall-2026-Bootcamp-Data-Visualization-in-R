@@ -25,4 +25,4 @@ Run the [workshop_setup.R](./Exercises/workshop_setup.R) script in the `Exercise
 
 ## Acknowledgements
 
-These materials have been adapted in part by content developed by Han Yu.
+These materials have been adapted in part from content developed by Han Yu.
