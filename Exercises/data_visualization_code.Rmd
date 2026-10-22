@@ -61,7 +61,7 @@ For this workshop, we will mostly use a "simple" [RNA-seq dataset](https://www.n
 Run this cell first to do some quick data cleanup.
 
 ```{r}
-counts <- read_csv("GSE164073_Eye_count_matrix.csv.gz")   # reads .gz directly
+counts <- read_csv("data/GSE164073_Eye_count_matrix.csv.gz")   # reads .gz directly
 
 # Some genes have zero reads in every sample - let's drop them
 counts <- counts %>% filter(rowSums(across(-Gene)) > 0)
