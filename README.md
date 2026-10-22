@@ -17,7 +17,7 @@ The seminar will also dive into specialized plots (e.g., heatmaps, Kaplan-Meier 
 
 To acquire the materials for the session, please run the `git clone` command with the repository URL:
 
-`git clone https://github.com/QLS-MiCM/Data-Visualization-in-R`
+`git clone https://github.com/QLS-MiCM/Fall-2026-Bootcamp-Data-Visualization-in-R`
 
 Alternatively, please download the zip file from the blue `Code` button and extract the contents.
 
