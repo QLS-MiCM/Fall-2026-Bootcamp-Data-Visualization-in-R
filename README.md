@@ -10,17 +10,14 @@ The seminar will also dive into specialized plots (e.g., heatmaps, Kaplan-Meier 
 
 ## Requirements
 
-1.  Previous experience with R 
-
-2.  Previous experience with basic *ggplot2* functionalities 
-
-3.  Experience with data manipulation using *dplyr* is recommended
+1.	Previous experience with R (basic understanding of syntax, data structures (data frames), and running scripts)
+1.	Experience with data manipulation using dplyr is recommended
 
 ## Setup
 
 To acquire the materials for the session, please run the `git clone` command with the repository URL:
 
-`git clone https://github.com/QLS-MiCM/Data-Visualization-in-R`
+`git clone https://github.com/QLS-MiCM/Fall-2026-Bootcamp-Data-Visualization-in-R`
 
 Alternatively, please download the zip file from the blue `Code` button and extract the contents.
 
@@ -28,4 +25,4 @@ Run the [workshop_setup.R](./Exercises/workshop_setup.R) script in the `Exercise
 
 ## Acknowledgements
 
-These materials have been adapted in part by content developed by Han Yu.
+These materials have been adapted in part from content developed by Han Yu.

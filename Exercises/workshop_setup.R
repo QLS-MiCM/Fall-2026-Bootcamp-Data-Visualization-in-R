@@ -2,7 +2,7 @@
 # List of required packages
 packages <- c("dplyr", "tidyverse", "ggplot2", "ggridges", "datasauRus", 
               "colorspace", "pheatmap", "survival", "survminer", "qqman", 
-              "plotly", "gganimate", "gifski", "palmerpenguins", "gapminder", 
+              "plotly", "gganimate", "ggrastr", "gifski", "palmerpenguins", "gapminder", 
               "shiny", "DT", "shinydashboard")
 
 # Install missing packages

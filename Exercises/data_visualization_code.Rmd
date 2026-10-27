@@ -1,7 +1,9 @@
 ---
 title: "Data Visualization Workshop"
 author: "Han Yu, Meghana Munipalle"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -16,13 +18,13 @@ Data visualization is a crucial skill in data science and analytics. In this tut
 
 Before we begin, ensure you have the necessary packages installed. To avoid any errors, install these at minimum to ensure their most recent versions:
 
-```{r}
+```{r, eval = FALSE}
 install.packages(c("xfun", "knitr", "rmarkdown"))
 ```
 
 Then check that these packages are here:
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -34,7 +36,6 @@ library(survival)
 library(survminer)
 library(qqman)
 library(plotly)
-library(ggridges)
 library(gganimate)
 library(gifski)
 library(palmerpenguins)
@@ -61,7 +62,7 @@ For this workshop, we will mostly use a "simple" [RNA-seq dataset](https://www.n
 Run this cell first to do some quick data cleanup.
 
 ```{r}
-counts <- read_csv("GSE164073_Eye_count_matrix.csv.gz")   # reads .gz directly
+counts <- read_csv("data/GSE164073_Eye_count_matrix.csv.gz")   # reads .gz directly
 
 # Some genes have zero reads in every sample - let's drop them
 counts <- counts %>% filter(rowSums(across(-Gene)) > 0)
@@ -102,10 +103,12 @@ We'll use both `samples` and `expr` for our visualizations depending on what we 
 Bar plot is used to visually compare categorical data by representing values with rectangular bars.
 
 ```{r}
+#| fig-width: 10
 # bar plot: discrete variable
 ggplot(samples, aes(x = sample, y = library_size / 1e6, fill = condition)) + 
   geom_col() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.margin = margin(t = 5, r = 5, b = 5, l = 40))
 ```
 
 ### 1.2 histogram/ frequency/ density plot
@@ -340,10 +343,12 @@ Compared with the earlier plot, the reader can now see every measurement, how ma
 ### 2.0 Prepare the dataset
 Let's continue using the same RNA-seq dataset, but we'll create one more small table to use in our plotting. This one is genes by sample and each gene's variance across samples.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(colorspace)
+```
 
+```{r}
 # long format: one row per gene per sample
 expr <- counts %>%
   pivot_longer(-Gene, names_to = "sample", values_to = "count") %>%
@@ -803,7 +808,66 @@ base + theme_classic() + ggtitle("theme_classic()")
 base + theme_void() + ggtitle("theme_void()")
 ```
 
-### 2.7 Exercise 1
+### 2.7 Exporting plots
+
+Once a plot looks right, we usually want to save it as a file, for example to finish a figure in a graphic editor like Inkscape. There are two kinds of image formats:
+
+- **Raster** formats (PNG, JPEG, TIFF) store the image as a grid of pixels. File size doesn't depend on the number of points, but text and lines can't be edited and the image gets blurry when enlarged.
+- **Vector** formats (SVG, PDF) store every point as a separate shape. The text is sharp & editable but a plot with tens of thousands of points becomes a very large file that is slow to open and edit.
+
+Our mock vs. infected scatter plot has about 40,000 points, so it is a good example of this problem.
+
+```{r, message = FALSE, warning = FALSE}
+library(ggrastr)
+```
+
+```{r}
+p_scatter <- ggplot(gene_summary, aes(x = mock + 1, y = CoV2 + 1, color = tissue)) +
+  geom_point(size = 0.5, alpha = 0.4) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Mock (CPM + 1)", y = "SARS-CoV-2 (CPM + 1)") +
+  theme_classic()
+
+# raster: a fixed grid of pixels (dpi = dots per inch)
+ggsave("scatter_raster.png", p_scatter, width = 6, height = 5, dpi = 300)
+
+# vector: every one of the ~40,000 points is a separate shape
+ggsave("scatter_vector.pdf", p_scatter, width = 6, height = 5)
+```
+
+#### 2.7.1 Rasterize only the points with ggrastr
+
+The ggrastr package offers a middle ground: it rasterizes only the layers with many data points and keeps everything else (axes, text, legend) in vector format. Wrap the layer you want to rasterize in `rasterise()`:
+
+```{r}
+p_mixed <- ggplot(gene_summary, aes(x = mock + 1, y = CoV2 + 1, color = tissue)) +
+  rasterise(geom_point(size = 0.5, alpha = 0.4), dpi = 300) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Mock (CPM + 1)", y = "SARS-CoV-2 (CPM + 1)") +
+  theme_classic()
+
+ggsave("scatter_mixed.pdf", p_mixed, width = 6, height = 5)
+
+# compare file sizes in MB
+file.size(c("scatter_raster.png", "scatter_vector.pdf", "scatter_mixed.pdf")) / 1e6
+```
+Alternatively, `rasterize()` can be applied to a finished plot, choosing layers by type:
+
+```{r}
+p_mixed2 <- rasterize(p_scatter, layers = "Point", dpi = 300)
+```
+
+When the mixed PDF is opened in Inkscape, the points appear as a single image that is quick to move and resize, and the axis labels, tick labels, and legend are still editable.
+
+Some tips:
+
+- `dpi = 300` is a common minimum for print figures. Higher resolution -> sharper image but larger file size
+- To save as SVG instead of PDF, use a file name ending in `.svg` (this requires the svglite package); Inkscape opens both formats
+- Set `width` and `height` in `ggsave()` to the size the figure will have in the final document (in inches by default), so that text sizes stay consistent and you don't need to rescale the figure later
+
+### 2.8 Exercise 1
 
 Improve the plot based on the following requirements.
 
@@ -849,7 +913,7 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
 
 Next, we will explore some specialized plots and learn which types of data are best suited for each. To avoid version errors, if you're using a new version of R and want to make sure, re-install these:
 
-```{r}
+```{r, eval = FALSE}
 install.packages("plotly")
 install.packages("ggplot2")
 ```
@@ -857,7 +921,7 @@ install.packages("ggplot2")
 
 Check for these libraries:
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(colorspace)
 library(pheatmap)
@@ -1065,8 +1129,9 @@ plot <- ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = country))
   ease_aes('linear')
 
 # Save at gif:
-animate(plot, width = 500, height = 357, renderer = gifski_renderer())
+anim <- animate(plot, width = 500, height = 357, units = "px", res = 96, renderer = gifski_renderer())
 anim_save("output.gif")
+anim
 ```
 
 ### 3.7 Shiny app
